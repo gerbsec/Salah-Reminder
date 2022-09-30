@@ -3,9 +3,8 @@ from discord.ext import commands, tasks
 import datetime as dt
 from pray_times_calculator import PrayerTimesCalculator
 
-id_list = 568747537872322570, 708372232115847312, 965808322768941129
+id_list = [708372232115847312 , 965808322768941126]
 bot = commands.Bot("$", intents=discord.Intents.default())
-token = ""
 calc = PrayerTimesCalculator(
     latitude=27.9506,
     longitude=-82.4572,
@@ -36,7 +35,9 @@ async def on_ready():
 @tasks.loop(seconds=30)
 async def salah():
     times = calc.fetch_prayer_times()
+    print(times)
     time = dt.datetime.now().time().strftime("%H:%M")
+    print(time)
     if time == times['Fajr']:
         for channel_id in id_list:
             message_channel = bot.get_channel(channel_id)
