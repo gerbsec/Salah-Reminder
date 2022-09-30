@@ -6,7 +6,7 @@ from pray_times_calculator import PrayerTimesCalculator
 
 id_list = 568747537872322570, 708372232115847312, 965808322768941129
 bot = commands.Bot("$", intents=discord.Intents.default())
-token = "OTY1ODEwNjM2OTA5MDg0Njkz.Yl4nPw.6sYxPDjham83ezSN8OZerxsZgXw"
+token = ""
 calc = PrayerTimesCalculator(
     latitude=27.9506,
     longitude=-82.4572,
