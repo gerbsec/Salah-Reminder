@@ -57,7 +57,7 @@ async def salah():
         time = dt.date.today().strftime("%m/%d/%y") + ' ' + times[salah]
         date = dt.datetime.strptime(time , "%m/%d/%y %H:%M")
         scheduler.add_job(send_message, 'date', run_date=date, args=[salah])
-        scheduler.add_job(send_message, 'date', run_date=date, args=[salah])
+        scheduler.add_job(ayatul_kursi, 'date', run_date=date, args=[salah])
     scheduler.start()
 
 
