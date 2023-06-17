@@ -42,7 +42,7 @@ async def send_message(salah):
 
 async def ayatul_kursi(salah):
     message_channel = bot.get_channel(channel_id)
-    await message_channel.send(f"<@&ID> Don't forget to read ayatul kursi after {salah}!\n https://tanzil.net/#2:255", allowed_mentions = allowed_mentions)
+    await message_channel.send(f"Don't forget to read ayatul kursi after {salah}!\n https://tanzil.net/#2:255", allowed_mentions = allowed_mentions)
 
 
 @bot.event
