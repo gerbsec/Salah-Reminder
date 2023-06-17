@@ -1,19 +1,16 @@
 import discord
 from discord.ext import commands, tasks
 import datetime as dt
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pray_times_calculator import PrayerTimesCalculator
 
 allowed_mentions = discord.AllowedMentions(everyone = True)
-channel_id = ID
+channel_id = CHANNEL_ID
 bot = commands.Bot("$", intents=discord.Intents.default())
-token = "TOKEN"
+token = TOKEN
+scheduler = AsyncIOScheduler()
 
-@bot.event
-async def on_ready():
-    await salah.start()
-
-@tasks.loop(seconds=30)
-async def salah():
+def calculate_times():
     calc = PrayerTimesCalculator(
         latitude=27.9506,
         longitude=-82.4572,
@@ -37,22 +34,32 @@ async def salah():
         isha_angle=15,
     )
     times = calc.fetch_prayer_times()
-    time = dt.datetime.now().time().strftime("%H:%M")
-    if time == times['Fajr']:
+    return times
+
+async def send_message(salah):    
         message_channel = bot.get_channel(channel_id)
-        await message_channel.send("<@&ID> It is Fajr time! Be sure to Pray Fajr!", allowed_mentions = allowed_mentions)
-    elif time == times['Dhuhr']:
-        message_channel = bot.get_channel(channel_id)
-        await message_channel.send("<@&ID> It is Dhuhr time! Be sure to Pray Dhuhr!", allowed_mentions = allowed_mentions)
-    elif time == times['Asr']:
-        message_channel = bot.get_channel(channel_id)
-        await message_channel.send("<@&ID> It is Asr time! Be sure to Pray Asr!", allowed_mentions = allowed_mentions)
-    elif time == times['Maghrib']:
-        message_channel = bot.get_channel(channel_id)
-        await message_channel.send("<@&ID> It is Maghrib time! Be sure to Pray Maghrib!", allowed_mentions = allowed_mentions)
-    elif time == times['Isha']:
-        message_channel = bot.get_channel(channel_id)
-        await message_channel.send("<@&ID> It is Ishaa time! Be sure to Pray Ishaa!", allowed_mentions = allowed_mentions)
+        await message_channel.send(f"<@&ID> It is {salah} time! Be sure to Pray {salah}!", allowed_mentions = allowed_mentions)
+
+async def ayatul_kursi(salah):
+    message_channel = bot.get_channel(channel_id)
+    await message_channel.send(f"<@&ID> Don't forget to read ayatul kursi after {salah}!\n https://tanzil.net/#2:255", allowed_mentions = allowed_mentions)
+
+
+@bot.event
+async def on_ready():
+    await salah.start()
+
+@tasks.loop(hours=24)
+async def salah():
+    times = calculate_times()
+    salahs = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"]
+    for salah in salahs:
+        time = dt.date.today().strftime("%m/%d/%y") + ' ' + times[salah]
+        date = dt.datetime.strptime(time , "%m/%d/%y %H:%M")
+        scheduler.add_job(send_message, 'date', run_date=date, args=[salah])
+        scheduler.add_job(send_message, 'date', run_date=date, args=[salah])
+    scheduler.start()
+
 
 if __name__ == "__main__":
     bot.run(token)
